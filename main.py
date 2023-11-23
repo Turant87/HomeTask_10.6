@@ -14,6 +14,7 @@ def send_welcome(message):
 @bot.message_handler(commands=['help'])
 def send_help(message):
     bot.reply_to(message, 'Введите /cr (currencyexchange), для того что бы узнать как с помощью бота ввести запрос на стоимость обмена валюты.') # replay_to - ответ с цитатой
+    bot.reply_to(message, 'Введите /values что бы узнать о всех доступных валютах')
     bot.reply_to(message, 'Введите /all, что бы узнать курсы валют на сегодня\n' '/usd - для курса доллара США\n' 
                      '/eur - для курса Евро\n' '/byn - для курса Белорусского рубля\n' '/kzt - для курса Казахстанского тенге\n'
                      '/try - для курса Турецкой лиры\n')
@@ -22,6 +23,26 @@ def send_help(message):
 def currencyexchange_help(message):
     bot.send_message(message.chat.id, 'Введите валюту которую Вы хотите поменять, валюту на которую Вы хотите поменять и количество, через пробел '
                                       'Например: usd eur 10 (запрос НЕ чувствителен к регистру)')
+
+@bot.message_handler(commands=['values'])
+def send_values(message):
+    result = get_all_available_currencies()
+
+    if result:
+        currencies = list(result.items())
+        page_size = 10
+        pages = [currencies[i:i+page_size] for i in range(0, len(currencies), page_size)]
+
+        for index, page in enumerate(pages):
+            currencies_info = ""
+            for currency_code, currency_info in page:
+                code = currency_info['code']
+                name = currency_info['name']
+                currencies_info += f'Код: {code}, Валюта: {name}\n'
+
+            bot.reply_to(message, f"Страница {index+1} из {len(pages)}\n\n{currencies_info}")
+    else:
+        bot.reply_to(message, "Ошибка при получении данных")
 
 
 @bot.message_handler(commands=['all'])

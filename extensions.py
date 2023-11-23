@@ -23,3 +23,15 @@ def get_currency_exchange_rate(base_currency, target_currency):
         return "Ошибка при получении данных"
 
 
+def get_all_available_currencies():
+    url = f'https://api.fxratesapi.com/currencies'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return None
+
+
+
